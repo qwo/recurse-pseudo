@@ -15,7 +15,16 @@ pip install -r requirements.txt
 python main.py
 ```
 
+## Docker
+
+docker build -t pseudo .
+docker run -p 8080:8080 pseudo 
+
+
+## ENV Vars
 You will also need to set the following environment variables:
+
+set them in the template from .env
 
 ```
 RC_OAUTH_CLIENT_ID=<your app client id>

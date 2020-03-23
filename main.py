@@ -4,6 +4,13 @@ import urllib.parse
 import os
 import json 
 
+
+### Load Env
+from dotenv import load_dotenv
+load_dotenv()
+
+FIRST_PAINT = True
+
 app = Flask(__name__)
 app.config['RC_API_URI'] = 'http://www.recurse.com/api/v1'
 app.config['RC_OAUTH_AUTH_URI'] = 'https://www.recurse.com/oauth/authorize'
@@ -61,9 +68,10 @@ def access_token():
     else:
         return req.text
 
+
 @app.route('/pseudonyms', methods=['GET'])
 def pseudonyms():
-
+    global FIRST_PAINT
     if 'user' not in session or session['user'] not in sessions:
         return redirect(url_for('index'))
 
@@ -74,9 +82,13 @@ def pseudonyms():
         u = get_user(token)
         user_pseudonym = u['pseudonym']
 
-        # get list of batches
-        batches = get_batches(token)
-
+        # get list of batches, only send back 5 for first paint
+        # this is because querying all # of batches (73) is difficult
+        if FIRST_PAINT: 
+            batches = get_batches(token)[:5]
+            FIRST_PAINT = False
+        else:
+            batches = get_batches(token)
         # get people from all batches
         batch_people = [(batch["name"],get_batch(token, batch["id"])) for batch in batches]
 
