@@ -1,0 +1,14 @@
+steps:
+# Deploy an image from Container Registry to Cloud Run
+- name: 'gcr.io/cloud-builders/gcloud'
+  args:
+  - 'run'
+  - 'deploy'
+  - 'rc-pseudo'
+  - '--image'
+  - 'gcr.io/we-heart-rc/rc-pseudo'
+  - '--region'
+  - 'us-central-1'
+  - '--platform'
+  - 'managed'
+  - '--allow-unauthenticated'
