@@ -8,7 +8,7 @@ steps:
   - '--image'
   - 'gcr.io/we-heart-rc/rc-pseudo'
   - '--region'
-  - 'us-central-1'
+  - 'us-central1'
   - '--platform'
   - 'managed'
   - '--allow-unauthenticated'
