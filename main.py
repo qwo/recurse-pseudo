@@ -79,8 +79,8 @@ def pseudonyms():
     token = sessions[user]
     if user in sessions:
         # get user
-        u = get_user(token)
-        user_pseudonym = u['pseudonym']
+        # u = get_user(token)
+        # user_pseudonym = u['pseudonym']
 
         # get list of batches, only send back 5 for first paint
         # this is because querying all # of batches (73) is difficult
