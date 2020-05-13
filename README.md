@@ -1,7 +1,7 @@
 # Recurse Center Pseudonyms.
 Show automatically generated pseudonyms for Recursers' applications grabbed from the RC API. 
 
-## [Check it out](http://pseudo.recurse.com)
+## [Check it out](http://pseudonyms.recurse.com/)
 RC OAuth authentication necessary. 
 
 Built on vanilla Python and Flask. Hosted on Heroku. 
