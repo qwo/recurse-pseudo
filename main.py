@@ -86,11 +86,11 @@ def pseudonyms():
 
         # get list of batches, only send back 5 for first paint
         # this is because querying all # of batches (73) is difficult
-        if FIRST_PAINT: 
-            batches = get_batches(token)[:5]
-            FIRST_PAINT = False
-        else:
-            batches = get_batches(token)
+#         if FIRST_PAINT: 
+         batches = get_batches(token)[:5]
+#             FIRST_PAINT = False
+#         else:
+#             batches = get_batches(token)
         if batch_people == False:
             # get people from all batches
             batch_people = [(batch["name"],get_batch(token, batch["id"])) for batch in batches]
