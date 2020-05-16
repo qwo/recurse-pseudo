@@ -4,13 +4,15 @@ import urllib.parse
 import os
 import json 
 
+from google.cloud import firestore
+db = firestore.Client()
+doc_ref = db.collection(u'cache').document('cache')
+
 
 ### Load Env
 from dotenv import load_dotenv
 load_dotenv()
 
-FIRST_PAINT = True
-batch_people = False
 
 app = Flask(__name__)
 app.config['RC_API_URI'] = 'http://www.recurse.com/api/v1'
@@ -72,8 +74,6 @@ def access_token():
 
 @app.route('/pseudonyms', methods=['GET'])
 def pseudonyms():
-    global FIRST_PAINT
-    global batch_people
     if 'user' not in session or session['user'] not in sessions:
         return redirect(url_for('index'))
 
@@ -82,18 +82,13 @@ def pseudonyms():
     if user in sessions:
         # get user
         u = get_user(token)
-        user_pseudonym = u.get('pseudonym')
-
-        # get list of batches, only send back 5 for first paint
-        # this is because querying all # of batches (73) is difficult
-#         if FIRST_PAINT: 
-         batches = get_batches(token)
-#             FIRST_PAINT = False
-#         else:
-#             batches = get_batches(token)
-        if batch_people == False:
+        if not request.args.get('uncache'):
+           batch_people = get_cached_batches()
+        else:
+            batches = get_batches(token)
             # get people from all batches
             batch_people = [(batch["name"],get_batch(token, batch["id"])) for batch in batches]
+            background_job(batch_people)
 
         return render_template('pseudonym.html', batches=batch_people, user=u)
     else:
@@ -110,6 +105,27 @@ def get_batch(access_token, batch_id):
     headers = make_header(access_token)
     req = requests.get("%s/batches/%d/people" % (app.config['RC_API_URI'], batch_id), headers=headers)
     return req.json()
+
+
+def get_cached_batches():
+    """Datastore trimmed down result """
+    doc_ref = db.collection(u'cache').document('cache')
+    result = doc_ref.get(['cache']).to_dict()['cache']
+    return json.loads(result)
+
+def background_job(batches):
+    """ Mimics the same bactch formatting """
+    result = []
+    for key, batch in batches:
+        batchlings = []
+        for r in batch:
+            attribs = ["first_name", "last_name", "pseudonym", "image"]
+            slim = {i: r.get(i) for i  in attribs}
+            batchlings.append(slim)
+        s = list([key,batchlings])
+        result.append(s)
+    
+    doc_ref.set({"cache": json.dumps(result)})
 
 def get_batches(access_token):
     headers = make_header(access_token)
