@@ -5,7 +5,7 @@ import os
 import json 
 
 from google.cloud import firestore
-db = firestore.Client()
+db = firestore.Client(project="we-heart-rc")
 doc_ref = db.collection(u'cache').document('cache')
 
 
@@ -15,6 +15,11 @@ load_dotenv()
 
 
 app = Flask(__name__)
+
+app.debug = True
+app.secret_key = os.environ.get('SECRET_SESSION') or "foobar"
+port = int(os.environ.get('PORT'))
+
 app.config['RC_API_URI'] = 'http://www.recurse.com/api/v1'
 app.config['RC_OAUTH_AUTH_URI'] = 'https://www.recurse.com/oauth/authorize'
 app.config['RC_OAUTH_TOKEN_URI'] = 'https://www.recurse.com/oauth/token'
@@ -82,8 +87,8 @@ def pseudonyms():
     if user in sessions:
         # get user
         u = get_user(token)
-        if not request.args.get('uncache'):
-           batch_people = get_cached_batches()
+        if request.args.get('update') is None:
+            batch_people = get_cached_batches()
         else:
             batches = get_batches(token)
             # get people from all batches
@@ -139,7 +144,4 @@ def get_user(access_token):
     return json.loads(req.text)
 
 if __name__ == '__main__':
-    app.debug = True
-    app.secret_key = app.config['SESSION_SECRET']
-    port = int(os.environ.get('PORT'))
     app.run(host='0.0.0.0', port=port)

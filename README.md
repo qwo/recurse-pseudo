@@ -18,6 +18,7 @@ python main.py
 ## Docker
 
 docker build -t pseudo .
+
 docker run -p 8080:8080 pseudo 
 
 
